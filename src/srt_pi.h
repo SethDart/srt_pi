@@ -74,7 +74,8 @@ private:
     bool LoadConfig( void );
     bool SaveConfig( void );
 
-    wxFileConfig     *m_pconfig;
+    wxFileConfig     *m_pConfig;
+    wxScrolledWindow *m_pOptionsPage;
 };
 
 #endif

@@ -70,7 +70,8 @@ int srt_pi::Init(void)
     AddLocaleCatalog( _T("opencpn-srt_pi") );
 
     //    Get a pointer to the opencpn configuration object
-    m_pconfig = GetOCPNConfigObject();
+    m_pConfig = GetOCPNConfigObject();
+    m_pOptionsPage = NULL;
 
     //    And load the configuration items
     LoadConfig();
@@ -83,6 +84,13 @@ int srt_pi::Init(void)
 
 bool srt_pi::DeInit(void)
 {
+    /* We must delete remaining page if the plugin is disabled while in Options dialog */
+    if ( m_pOptionsPage )
+    {
+        if ( DeleteOptionsPage( m_pOptionsPage ) )
+            m_pOptionsPage = NULL;
+        // TODO: else memory leak?
+    }
     SaveConfig();
     return true;
 }
@@ -130,8 +138,8 @@ This OEM board is widely used.");
 
 void srt_pi::OnSetupOptions(void)
 {
-    wxScrolledWindow *page = AddOptionsPage( PI_OPTIONS_PARENT_CONNECTIONS, _("SRT") );
-    if (! page) {
+    m_pOptionsPage = AddOptionsPage( PI_OPTIONS_PARENT_CONNECTIONS, _("SRT") );
+    if (! m_pOptionsPage) {
         wxLogMessage( _T("Error: AddOptionsPage failed!") );
         return;
     }
@@ -139,7 +147,7 @@ void srt_pi::OnSetupOptions(void)
 
 bool srt_pi::LoadConfig(void)
 {
-    wxFileConfig *pConf = (wxFileConfig *)m_pconfig;
+    wxFileConfig *pConf = (wxFileConfig *)m_pConfig;
 
     if(pConf)
     {
@@ -157,7 +165,7 @@ bool srt_pi::LoadConfig(void)
 
 bool srt_pi::SaveConfig(void)
 {
-    wxFileConfig *pConf = (wxFileConfig *)m_pconfig;
+    wxFileConfig *pConf = (wxFileConfig *)m_pConfig;
 
     if(pConf)
     {
